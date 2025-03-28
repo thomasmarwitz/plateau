@@ -1,3 +1,4 @@
+import pdb
 from collections.abc import Callable, Iterable
 from functools import partial
 from typing import Any, cast
@@ -260,14 +261,14 @@ def read_table(
         predicates=predicates,
         factory=ds_factory,
     )
-
+    pdb.set_trace()
     empty_df = empty_dataframe_from_schema(
         schema=ds_factory.schema,
         columns=columns,
     )
     if categoricals:
-        empty_df = empty_df.astype({col: "category" for col in categoricals})
-    dfs = list(partitions) + [empty_df]
+        empty_df = empty_df.astype(dict.fromkeys(categoricals, "category"))
+    dfs = list(partitions) + [empty_df] # Partitions (float32) + empty_df (float64/double)
     # require meta 4 otherwise, can't construct types/columns
     if categoricals:
         dfs = align_categories(dfs, categoricals)
@@ -276,6 +277,8 @@ def read_table(
     # ensure column order
     if len(empty_df.columns) > 0 and list(empty_df.columns) != list(df.columns):
         df = df.reindex(empty_df.columns, copy=False, axis=1)
+
+    pdb.set_trace()
 
     return df
 
